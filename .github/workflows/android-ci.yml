@@ -1,15 +1,16 @@
-name: Android CI
+name: Android DevSecOps Pipeline
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
 
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -22,8 +23,17 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build Project
+      - name: Build application
         run: ./gradlew build
 
-      - name: Run Tests
+      - name: Run unit tests
         run: ./gradlew test
+
+      - name: Generate APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
